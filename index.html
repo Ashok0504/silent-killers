@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team A vs Team B Cricket Scoreboard</title>
+    <meta name="description" content="A premium, interactive cricket scoreboard for Team A vs Team B. Track runs, wickets, overs, extras, and player stats in real-time.">
+    <!-- Outfit & Inter Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Ambient Glow BG -->
+    <div class="glow bg-glow-1"></div>
+    <div class="glow bg-glow-2"></div>
+
+    <!-- Match Setup & Roster Registration Screen -->
+    <div id="match-setup-screen" class="setup-container animate-fade-in" style="flex-direction: column; gap: 30px; padding: 40px 16px;">
+        <div class="setup-card animate-pop">
+            <div class="setup-header">
+                <i class="fa-solid fa-trophy setup-trophy-icon"></i>
+                <h2>Cricket Match Setup</h2>
+                <p>Register Team Squads & Configure Toss Details to Begin</p>
+            </div>
+            
+            <div class="setup-squads-row">
+                <!-- Team A Roster Card -->
+                <div class="squad-setup-card">
+                    <div class="team-name-setup-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                        <i class="fa-solid fa-shield-halved text-blue" style="font-size: 1.15rem;"></i>
+                        <input type="text" id="setup-team-a-name" class="setup-team-title-input" value="Team A" placeholder="Enter Team A Name" oninput="syncTossWinnerSelectLabels()">
+                    </div>
+                    <div class="setup-player-list" id="setup-team-a-list">
+                        <!-- Dynamic Player Rows -->
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="addSetupPlayer('a')" style="background: rgba(59,130,246,0.08) !important; border: 1px dashed rgba(59,130,246,0.3) !important; color: var(--color-blue) !important; width: 100%; justify-content: center; font-weight: 700; margin-top: 10px;">
+                        <i class="fa-solid fa-plus"></i> Add Player
+                    </button>
+                </div>
+                
+                <!-- Team B Roster Card -->
+                <div class="squad-setup-card">
+                    <div class="team-name-setup-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                        <i class="fa-solid fa-users text-green" style="font-size: 1.15rem;"></i>
+                        <input type="text" id="setup-team-b-name" class="setup-team-title-input" value="Team B" placeholder="Enter Team B Name" oninput="syncTossWinnerSelectLabels()">
+                    </div>
+                    <div class="setup-player-list" id="setup-team-b-list">
+                        <!-- Dynamic Player Rows -->
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="addSetupPlayer('b')" style="background: rgba(16,185,129,0.08) !important; border: 1px dashed rgba(16,185,129,0.3) !important; color: var(--color-green) !important; width: 100%; justify-content: center; font-weight: 700; margin-top: 10px;">
+                        <i class="fa-solid fa-plus"></i> Add Player
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Match Rules & Toss Settings -->
+            <div class="toss-settings-card">
+                <h3><i class="fa-solid fa-sliders"></i> Match & Toss Details</h3>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label for="setup-overs">Overs Limit:</label>
+                        <input type="number" id="setup-overs" value="6" min="1" max="20" class="setup-input">
+                    </div>
+                    <div class="setting-item">
+                        <label for="setup-toss-winner">Toss Winner:</label>
+                        <select id="setup-toss-winner" class="setup-select">
+                            <option value="a">Team A</option>
+                            <option value="b">Team B</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label for="setup-toss-decision">Toss Decision:</label>
+                        <select id="setup-toss-decision" class="setup-select">
+                            <option value="bat">Bat First</option>
+                            <option value="bowl">Bowl First</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="setup-action-area" style="margin-top: 24px; text-align: center;">
+                    <button class="btn btn-primary" onclick="launchScoreboard()" style="width: 100%; max-width: 320px; font-size: 1.05rem; padding: 12px 24px; box-shadow: 0 0 20px rgba(59,130,246,0.3);">
+                        <i class="fa-solid fa-circle-play"></i> Start Match / Let's Play!
+                    </button>
+                </div>
+            </div>
+            </div>
+
+        <!-- Cloud & Data Safety Card on Setup Page -->
+        <div class="setup-card animate-pop data-safety-setup-card" style="max-width: 960px; margin-top: 0; padding: 24px 32px;">
+            <div class="setup-header" style="margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <i class="fa-solid fa-server setup-trophy-icon" style="font-size: 2.2rem; color: var(--color-blue); margin-bottom: 8px;"></i>
+                <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0;">Cloud & Data Safety</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Backup or restore your scoreboard records offline</p>
+            </div>
+            
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; width: 100%;">
+                <button class="btn btn-secondary" onclick="exportDataBackup()" style="flex: 1; min-width: 220px; justify-content: center; font-weight: 700; padding: 12px 18px;">
+                    <i class="fa-solid fa-cloud-arrow-down" style="color: var(--color-blue); margin-right: 8px;"></i> Backup History (.json)
+                </button>
+                <button class="btn btn-secondary" onclick="triggerImportBackup()" style="flex: 1; min-width: 220px; justify-content: center; font-weight: 700; padding: 12px 18px; border-style: dashed !important;">
+                    <i class="fa-solid fa-cloud-arrow-up" style="color: var(--color-gold); margin-right: 8px;"></i> Restore History (.json)
+                </button>
+                <input type="file" id="backup-file-input" accept=".json" style="display: none;" onchange="importDataBackup(event)">
+            </div>
+        </div>
+
+        <!-- Saved Matches History Card on Setup Page -->
+        <div class="setup-card animate-pop history-setup-card" style="max-width: 960px; margin-top: 0; padding: 24px 32px;">
+            <div class="setup-header" style="margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                <i class="fa-solid fa-history setup-trophy-icon" style="font-size: 2.2rem; color: var(--color-gold); margin-bottom: 8px;"></i>
+                <h3 style="font-family: var(--font-heading); font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin: 0;">Saved Match History</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Manage, review, or reload your previously saved matches</p>
+            </div>
+            
+            <div class="history-setup-grid" id="history-setup-container">
+                <p class="no-history-text">No matches saved yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Scoring Dashboard Container (Initially Hidden) -->
+    <div id="scoreboard-dashboard" class="hidden">
+        <div class="app-layout">
+        <!-- Main Dashboard -->
+        <main class="main-dashboard">
+            <!-- Header -->
+            <header class="header">
+                <div class="match-title-area">
+                    <h1 class="main-title" style="display: flex; align-items: center; gap: 10px;">
+                        <img src="logo.png" alt="Silent Killers Logo" style="height: 32px; width: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color);">
+                        Silent Killers
+                    </h1>
+                    <p class="match-subtitle" id="status-display">Match in Progress</p>
+                </div>
+                <div class="header-badges" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="tag tag-neon"><i class="fa-solid fa-trophy"></i> Team A vs Team B Edition</span>
+                    <button class="btn btn-secondary btn-sm" onclick="shareMatchToWhatsApp()" style="background: rgba(37,211,102,0.1) !important; border: 1px solid rgba(37,211,102,0.3) !important; color: #25d366 !important; font-size: 0.76rem; padding: 6px 12px; cursor: pointer; border-radius: var(--radius-sm); pointer-events: auto !important; height: 32px;" title="Share Scorecard to WhatsApp">
+                        <i class="fa-brands fa-whatsapp" style="font-size: 0.95rem;"></i> Share Score
+                    </button>
+                    <button class="btn-theme" onclick="toggleTheme()" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+                </div>
+            </header>
+
+            <!-- Innings view selectors -->
+            <div class="innings-tabs-row" id="innings-view-tabs">
+                <button class="tab-btn active" id="tab-innings-1" onclick="switchViewTab(1)">
+                    <i class="fa-solid fa-circle-chevron-right" style="color: var(--color-blue);"></i> Team A Innings
+                </button>
+                <button class="tab-btn" id="tab-innings-2" onclick="switchViewTab(2)">
+                    <i class="fa-solid fa-circle-chevron-right" style="color: var(--text-muted);"></i> Team B Innings
+                </button>
+            </div>
+
+            <!-- Main Score Readout -->
+            <section class="score-grid-container">
+                <!-- Large Digital Display Card -->
+                <div class="card display-card">
+                    <div class="display-header">
+                        <span class="display-tag">Innings Score</span>
+                        <span class="live-indicator"><span class="dot"></span> LIVE</span>
+                    </div>
+                    <div class="display-score-large">
+                        <span id="score-runs">0</span>
+                        <span class="slash">/</span>
+                        <span id="score-wickets">0</span>
+                    </div>
+                    <div class="display-overs">
+                        Overs: <span id="score-overs">0.0</span> <span class="overs-max">(Max <span id="max-overs-limit">6.0</span>)</span>
+                    </div>
+                    
+                    <!-- Progress bar of current overs completed -->
+                    <div class="overs-progress-bar">
+                        <div class="overs-progress-fill" id="overs-progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Run Rate & Chase Stats Card -->
+                <div class="card runrate-card">
+                    <h3>Match Rates</h3>
+                    <div class="stats-row">
+                        <div class="stat-item">
+                            <span class="stat-number gradient-text" id="stat-crr">0.00</span>
+                            <span class="stat-label">Current Run Rate</span>
+                        </div>
+                        <div class="stat-item separator">
+                            <span class="stat-number text-muted" id="stat-rrr">-</span>
+                            <span class="stat-label">Required Run Rate</span>
+                        </div>
+                    </div>
+                    <div class="chase-details-box hidden" id="chase-details">
+                        <p id="chase-msg">Need <strong>-</strong> runs in <strong>-</strong> balls</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Squad Details: Batsmen & Bowler Tracker -->
+            <section class="players-section">
+                <!-- Batsmen stats card -->
+                <div class="card player-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-user-pen icon-spacing"></i> Active Batsmen</h3>
+                    </div>
+                    <div class="player-stats-table">
+                        <div class="table-row table-head batsman-row">
+                            <span>Batsman Name</span>
+                            <span>Runs</span>
+                            <span>Balls</span>
+                            <span>4s</span>
+                            <span>6s</span>
+                            <span>SR</span>
+                        </div>
+                        <!-- Batsman 1 -->
+                        <div class="table-row active-strike batsman-row" id="row-batsman-1">
+                            <input type="text" id="bat1-name" value="Batsman 1" onchange="updatePlayerNames()" aria-label="Batsman 1 Name">
+                            <span class="stat-highlight" id="bat1-runs" onclick="strikeChange(1)">0*</span>
+                            <span id="bat1-balls">0</span>
+                            <span id="bat1-fours">0</span>
+                            <span id="bat1-sixes">0</span>
+                            <span class="text-muted" id="bat1-sr">0.0</span>
+                        </div>
+                        <!-- Batsman 2 -->
+                        <div class="table-row batsman-row" id="row-batsman-2">
+                            <input type="text" id="bat2-name" value="Batsman 2" onchange="updatePlayerNames()" aria-label="Batsman 2 Name">
+                            <span class="stat-highlight" id="bat2-runs" onclick="strikeChange(2)">0</span>
+                            <span id="bat2-balls">0</span>
+                            <span id="bat2-fours">0</span>
+                            <span id="bat2-sixes">0</span>
+                            <span class="text-muted" id="bat2-sr">0.0</span>
+                        </div>
+                    </div>
+                    <p class="table-tip"><i class="fa-solid fa-circle-info"></i> Click a batsman's runs to set them on-strike (starred *).</p>
+                </div>
+
+                <!-- Bowler stats card -->
+                <div class="card player-card">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <h3><i class="fa-solid fa-baseball icon-spacing"></i> Bowler Status</h3>
+                        <button class="btn btn-secondary btn-sm" onclick="openBowlerModal()" style="background: transparent !important; border: 1px solid var(--border-color) !important; box-shadow: none !important; color: var(--text-main) !important; padding: 4px 8px; font-size: 0.72rem; border-radius: var(--radius-sm); cursor: pointer;">
+                            <i class="fa-solid fa-arrows-rotate"></i> Change Bowler
+                        </button>
+                    </div>
+                    <div class="player-stats-table">
+                        <div class="table-row table-head bowler-row">
+                            <span>Bowler Name</span>
+                            <span>Overs</span>
+                            <span>Runs</span>
+                            <span>Wickets</span>
+                            <span>Econ</span>
+                        </div>
+                        <div class="table-row bowler-row">
+                            <input type="text" id="bowler-name" value="Bowler" onchange="updatePlayerNames()" aria-label="Bowler Name">
+                            <span id="bowler-overs">0.0</span>
+                            <span id="bowler-runs">0</span>
+                            <span class="stat-highlight" id="bowler-wickets">0</span>
+                            <span class="text-muted" id="bowler-econ">0.0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Live Match Scorecard (Batting & Bowling History) -->
+            <section class="scorecard-section">
+                <div class="card scorecard-card">
+                    <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">
+                        <h3><i class="fa-solid fa-clipboard-list icon-spacing"></i> Live Innings Scorecard</h3>
+                        <span class="badge badge-success"><i class="fa-solid fa-chart-line"></i> Full Match Stats</span>
+                    </div>
+                    <div class="scorecard-grid">
+                        <!-- Batting Innings Stats -->
+                        <div class="scorecard-column">
+                            <h4 class="scorecard-col-title"><i class="fa-solid fa-user-pen"></i> Batting Performance</h4>
+                            <div class="scorecard-table" id="scorecard-batting-list">
+                                <!-- Dynamically populated in app.js -->
+                            </div>
+                        </div>
+                        
+                        <!-- Bowling Innings Stats -->
+                        <div class="scorecard-column">
+                            <h4 class="scorecard-col-title"><i class="fa-solid fa-baseball"></i> Bowling Performance</h4>
+                            <div class="scorecard-table" id="scorecard-bowling-list">
+                                <!-- Dynamically populated in app.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ball Tracker and Entry Controls -->
+            <section class="controls-section">
+                <!-- Current Over ball details -->
+                <div class="card over-tracker-card">
+                    <div class="over-tracker-header">
+                        <h4>Current Over Tracker</h4>
+                        <span class="text-muted" id="balls-in-over-count">Balls: 0 / 6</span>
+                    </div>
+                    <div class="ball-circles-container" id="ball-list">
+                        <!-- Ball circles will be generated dynamically -->
+                        <span class="empty-ball-placeholder">Waiting for first ball...</span>
+                    </div>
+                </div>
+
+                <!-- Operational scoring buttons -->
+                <div class="scoring-panels-grid">
+                    <!-- Standard Runs Card -->
+                    <div class="card action-card">
+                        <h4>Standard Runs</h4>
+                        <div class="btn-group">
+                            <button class="btn-score" onclick="addScore(0)">0 <span>Dot</span></button>
+                            <button class="btn-score" onclick="addScore(1)">1 <span>Single</span></button>
+                            <button class="btn-score" onclick="addScore(2)">2 <span>Double</span></button>
+                            <button class="btn-score" onclick="addScore(3)">3 <span>Triple</span></button>
+                            <button class="btn-score btn-boundary" onclick="addScore(4)">4 <span class="badge-boundary">FOUR</span></button>
+                            <button class="btn-score btn-boundary" onclick="addScore(6)">6 <span class="badge-boundary">SIX</span></button>
+                        </div>
+                    </div>
+
+                    <!-- Extras & Wickets Card -->
+                    <div class="card action-card">
+                        <h4>Extras & Dismissals</h4>
+                        <div class="btn-group bg-group-danger">
+                            <button class="btn-score btn-extra" onclick="addExtra('wd')">Wd <span>Wide</span></button>
+                            <button class="btn-score btn-extra" onclick="addExtra('nb')">Nb <span>No Ball</span></button>
+                            <button class="btn-score btn-extra" onclick="addExtra('bye')">B / Lb <span>Bye</span></button>
+                            <button class="btn-score btn-wicket" onclick="triggerWicket()">W <span>Wicket</span></button>
+                        </div>
+                    </div>
+
+                    <!-- Undo & Management Card -->
+                    <div class="card action-card centered-actions">
+                        <h4>Match Controls</h4>
+                        
+                        <!-- Inline settings in controls -->
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px; background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); width: 100%;">
+                            <input type="checkbox" id="toggle-auto-bowler-change" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--color-blue);">
+                            <label for="toggle-auto-bowler-change" style="margin-bottom: 0; cursor: pointer; font-size: 0.8rem; font-weight: 700; user-select: none; color: var(--text-main);">Auto-Change Bowler</label>
+                        </div>
+
+                        <div class="utility-btns">
+                            <button class="btn-util btn-undo" id="btn-undo" onclick="undoLastBall()" disabled>
+                                <i class="fa-solid fa-undo"></i> Undo Ball
+                            </button>
+                            <button class="btn-util btn-save" onclick="saveCurrentMatch()">
+                                <i class="fa-solid fa-floppy-disk"></i> Save Match
+                            </button>
+                            <button class="btn-util btn-reset" onclick="confirmReset()">
+                                <i class="fa-solid fa-rotate"></i> Reset Board
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Squad Roster Managers Cards (Unmerged Squads) -->
+            <section class="squad-section squad-rosters-grid">
+                <!-- Team A Squad -->
+                <div class="card roster-card">
+                    <div class="card-header roster-card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <h3><i class="fa-solid fa-shield-halved icon-spacing"></i> Team A Squad</h3>
+                    </div>
+                    <p class="helper-text" style="margin: 8px 0 16px 24px; font-size: 0.78rem;">Roster for Team A. Used when batting or bowling.</p>
+                    <div class="roster-grid" id="roster-us-grid"></div>
+                </div>
+
+                <!-- Team B Squad -->
+                <div class="card roster-card">
+                    <div class="card-header roster-card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                        <h3><i class="fa-solid fa-users icon-spacing"></i> Team B Squad</h3>
+                    </div>
+                    <p class="helper-text" style="margin: 8px 0 16px 24px; font-size: 0.78rem;">Roster for Team B. Used when batting or bowling.</p>
+                    <div class="roster-grid" id="roster-them-grid"></div>
+                </div>
+            </section>
+        </main>
+        </div>
+    </div>
+
+    <!-- Wicket Dismissal Detail Modal -->
+    <div id="dismissal-modal" class="modal-overlay hidden">
+        <div class="modal-card animate-pop" style="max-width: 440px;">
+            <div class="modal-icon" style="background-color: var(--color-danger-glow); border-color: var(--color-danger); color: var(--color-danger);">
+                <i class="fa-solid fa-person-falling-burst"></i>
+            </div>
+            <h2>Dismissal Details</h2>
+            <p class="helper-text" style="margin-bottom: 20px; color: var(--text-muted);">Select the wicket type and fielder involved:</p>
+            
+            <!-- Dismissal Type Buttons -->
+            <div class="dismissal-type-buttons" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+                <button class="btn-dismissal-type" data-type="bowled" onclick="selectDismissalType('bowled')">Bowled</button>
+                <button class="btn-dismissal-type" data-type="caught" onclick="selectDismissalType('caught')">Caught</button>
+                <button class="btn-dismissal-type" data-type="runout" onclick="selectDismissalType('runout')">Run Out</button>
+                <button class="btn-dismissal-type" data-type="lbw" onclick="selectDismissalType('lbw')">LBW</button>
+                <button class="btn-dismissal-type" data-type="stumped" onclick="selectDismissalType('stumped')">Stumped</button>
+                <button class="btn-dismissal-type" data-type="hitwicket" onclick="selectDismissalType('hitwicket')">Hit Wicket</button>
+            </div>
+            
+            <!-- Fielder Selection (Hidden initially) -->
+            <div id="fielder-selection-container" class="hidden" style="margin-bottom: 20px; text-align: left;">
+                <h4 style="font-size: 0.82rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px;">Select Fielder:</h4>
+                <div class="roster-select-list" id="modal-fielder-list" style="max-height: 180px;">
+                    <!-- Dynamically populated bowling squad -->
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="cancelDismissal()">Cancel Wicket</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wicket Next Batsman Selector Modal -->
+    <div id="wicket-modal" class="modal-overlay hidden">
+        <div class="modal-card animate-pop" style="max-width: 440px;">
+            <div class="modal-icon" style="background-color: var(--color-danger-glow); border-color: var(--color-danger); color: var(--color-danger);">
+                <i class="fa-solid fa-person-walking-arrow-right"></i>
+            </div>
+            <h2>Wicket Fallen!</h2>
+            <p class="helper-text" style="margin-bottom: 12px; color: var(--text-muted);">Select the next batsman from the squad roster to take the crease:</p>
+            <div class="roster-select-list" id="modal-roster-list">
+                <!-- Will be dynamically populated with unbatted squad players -->
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeWicketModal()">Cancel / Keep Strike</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bowler Selection Modal -->
+    <div id="bowler-modal" class="modal-overlay hidden">
+        <div class="modal-card animate-pop" style="max-width: 440px;">
+            <div class="modal-icon" style="background-color: var(--color-blue-glow); border-color: var(--color-blue); color: var(--color-blue);">
+                <i class="fa-solid fa-baseball"></i>
+            </div>
+            <h2>Select Bowler for Next Over</h2>
+            <p class="helper-text" style="margin-bottom: 12px; color: var(--text-muted);">Select the bowler to bowl the next over from the roster:</p>
+            <div class="roster-select-list" id="modal-bowler-list">
+                <!-- Will be dynamically populated with squad players -->
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeBowlerModal()">Keep Current Bowler / Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Match Over Overlay Dialog -->
+    <div id="match-over-modal" class="modal-overlay hidden">
+        <div class="modal-card animate-pop">
+            <div class="modal-icon">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h2 id="match-over-modal-title">Match Completed!</h2>
+            <p id="modal-match-summary">Team A score is 0/0.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="if (confirmReset()) closeMatchModal();"><i class="fa-solid fa-rotate-right"></i> Start New Match</button>
+                <button class="btn btn-secondary" onclick="closeMatchModal()">View Full Scorecard</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Saved Match Full Details Right Sidebar Drawer -->
+    <div id="history-details-overlay" class="history-drawer-overlay" onclick="closeHistoryDetailsModal()"></div>
+    <div id="history-details-modal" class="history-details-drawer">
+        <div class="drawer-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px;">
+            <h2 id="history-modal-title" style="margin: 0; font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-clipboard-list" style="color: var(--color-gold);"></i> Scorecard Details
+            </h2>
+            <button class="btn-sidebar-close" onclick="closeHistoryDetailsModal()" style="display: inline-flex !important; font-size: 1.4rem; color: var(--text-muted); cursor: pointer;" aria-label="Close Scorecard Drawer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        
+        <!-- History view selectors -->
+        <div class="innings-tabs-row" id="history-tabs-row" style="margin-bottom: 16px; justify-content: center;">
+            <button class="tab-btn active" id="btn-history-tab-1" onclick="toggleHistoryModalTab(1)" style="padding: 8px 14px; font-size: 0.76rem; cursor: pointer;">
+                Team A Innings
+            </button>
+            <button class="tab-btn" id="btn-history-tab-2" onclick="toggleHistoryModalTab(2)" style="padding: 8px 14px; font-size: 0.76rem; cursor: pointer;">
+                Team B Innings
+            </button>
+        </div>
+        
+        <div class="history-modal-meta-row" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <span id="history-modal-date" style="font-weight: 600; color: var(--text-muted); font-size: 0.82rem;">Date: -</span>
+            <span id="history-modal-summary" style="font-weight: 700; color: var(--color-gold); font-size: 0.85rem;">Summary: -</span>
+        </div>
+        
+        <!-- History Scorecard Content Panel (Vertical Stack inside Drawer) -->
+        <div class="history-scorecard-grid">
+            <!-- Batting Innings Stats -->
+            <div class="scorecard-column">
+                <h4 class="scorecard-col-title"><i class="fa-solid fa-user-pen"></i> Batting Card</h4>
+                <div class="scorecard-table" id="history-batting-list" style="overflow-y: visible;">
+                    <!-- Populate dynamically -->
+                </div>
+            </div>
+            
+            <!-- Bowling Innings Stats -->
+            <div class="scorecard-column">
+                <h4 class="scorecard-col-title"><i class="fa-solid fa-baseball"></i> Bowling Card</h4>
+                <div class="scorecard-table" id="history-bowling-list" style="overflow-y: visible;">
+                    <!-- Populate dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Extras & Targets Info -->
+        <div class="history-modal-extras-box" style="margin-top: 20px; padding: 12px 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-align: left;">
+                <strong>Extras:</strong> Wides: <span id="history-modal-wides" style="color: var(--text-main); font-weight: 600;">0</span> | 
+                No Balls: <span id="history-modal-noballs" style="color: var(--text-main); font-weight: 600;">0</span> | 
+                Byes: <span id="history-modal-byes" style="color: var(--text-main); font-weight: 600;">0</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-align: right;">
+                <strong>Target:</strong> <span id="history-modal-target" style="color: var(--color-green); font-weight: 700;">-</span>
+            </div>
+        </div>
+
+        <!-- Awards Panel in Viewer -->
+        <div id="history-awards-container"></div>
+
+        <div class="modal-buttons" style="margin-top: 28px; margin-bottom: 12px; gap: 12px;">
+            <button class="btn btn-secondary" onclick="closeHistoryDetailsModal()" style="flex: 1;">Close</button>
+            <button class="btn btn-primary" onclick="shareHistoryMatchToWhatsApp()" style="background: #25d366 !important; border-color: #25d366 !important; color: #ffffff !important; flex: 1.5; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                <i class="fa-brands fa-whatsapp"></i> Share Score
+            </button>
+        </div>
+    </div>
+
+
+
+    <script src="app.js"></script>
+</body>
+</html>
