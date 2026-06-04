@@ -1442,6 +1442,12 @@ body {
         gap: 4px;
         padding: 10px 12px;
     }
+    
+    /* Stack squad rosters vertically on mobile to prevent squished layouts */
+    .squad-rosters-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
 }
 
 /* History Scorecard Details & Bowler Highlight Premium Styles */
@@ -1632,8 +1638,6 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-}
-
 }
 
 .hidden {
